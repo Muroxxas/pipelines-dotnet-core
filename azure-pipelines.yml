@@ -1,0 +1,26 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- bash: |
+    echo "Using an input-macro works: $(DEV_CONNECTION_STRING)"
+    echo "Using the env var directly does not work: $DEV_CONNECTION_STRING"
+    echo "Using a global secret var mapped in the pipeline does not work either: $GLOBAL_MYSECRET"
+    echo "Using a global non-secret var mapped in the pipeline works: $GLOBAL_MY_MAPPED_ENV_VAR" 
+    echo "Using the mapped env var for this task works and is recommended: $MY_MAPPED_ENV_VAR"
+  env:
+    MY_MAPPED_ENV_VAR: $(DEV_CONNECTION_STRING) # the recommended way to map to an env variable
